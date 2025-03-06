@@ -7,7 +7,8 @@ from typing import List, Dict, Any
 # Create client
 client = openai.OpenAI(
     base_url="https://api.groq.com/openai/v1",
-    api_key=os.environ["GROQ_API_KEY"],
+    # api_key=os.environ["GROQ_API_KEY"],
+    api_key="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"
 )
 
 # Define the schema for LLM response
