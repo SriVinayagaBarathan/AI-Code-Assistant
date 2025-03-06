@@ -40,7 +40,7 @@ chat_completion = client.chat.completions.create(
     },
     messages=[
         {"role": "system", "content": "You are an expert Python code optimizer. Return the response **strictly** in JSON format matching this schema:\n" + json.dumps(LLMResponse.model_json_schema(), indent=2)},
-        {"role": "user", "content": "\n\ndef fibonacci(n):\n    if n <= 1:\n        return n\n    else:\n        return fibonacci(n-1) + fibonacci(n-2)"}
+        {"role": "user", "content": "   "}
     ],
 )
 

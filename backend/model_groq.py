@@ -3,115 +3,69 @@
 
 
 
-# from typing import List, Optional
-# import json
-
-# from pydantic import BaseModel
-# from groq import Groq
-# import os
-# from dotenv import load_dotenv
-
-# # Load environment variables from .env file
-# load_dotenv()
-
-
-
- 
-
-# groq = Groq(api_key=os.getenv("GROQ_API_KEY"))
-
-
-# chat_completion = groq.chat.completions.create(
-#     #
-#     # Required parameters
-#     #
-#     messages=[
-#         # Set an optional system message. This sets the behavior of the
-#         # assistant and can be used to provide specific instructions for
-#         # how it should behave throughout the conversation.
-#         {
-#             "role": "system",
-#             "content": "you are a helpful assistant."
-#         },
-#         # Set a user message for the assistant to respond to.
-#         {
-#             "role": "user",
-#             "content": "Explain the importance of fast language models",
-#         }
-#     ],
-
-#     # The language model which will generate the completion.
-#     model="llama-3.3-70b-versatile",
-
-#     #
-#     # Optional parameters
-#     #
-
-#     # Controls randomness: lowering results in less random completions.
-#     # As the temperature approaches zero, the model will become deterministic
-#     # and repetitive.
-#     temperature=0.5,
-
-#     # The maximum number of tokens to generate. Requests can use up to
-#     # 32,768 tokens shared between prompt and completion.
-#     max_completion_tokens=1024,
-
-#     # Controls diversity via nucleus sampling: 0.5 means half of all
-#     # likelihood-weighted options are considered.
-#     top_p=1,
-
-#     # A stop sequence is a predefined or user-specified text string that
-#     # signals an AI to stop generating content, ensuring its responses
-#     # remain focused and concise. Examples include punctuation marks and
-#     # markers like "[end]".
-#     stop=None,
-
-#     # If set, partial message deltas will be sent.
-#     stream=False,
-# )
-
-# # Print the completion returned by the LLM.
-# print(chat_completion.choices[0].message.content)
-
-
-
-
-
-from groq import Groq
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-
 import os
 import json
 import openai
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
+from typing import List, Dict, Any
+
+
+
+
+
+# Define the schema for LLM response
+class TestCase(BaseModel):
+    """Schema for test cases with input and expected output."""
+    input: Dict[str, Any] = Field(..., description="Input parameters for the function")
+    expected_output: Any = Field(..., description="Expected output from the function")
+
+class FinalOutput(BaseModel):
+    """Schema for the final optimized code and its explanation."""
+    code: str = Field(..., description="The optimized or completed Python function")
+    explanation: str = Field(..., description="A detailed explanation of the changes made")
+
+class LLMResponse(BaseModel):
+    """Schema for the LLM-generated response following structured output."""
+    observation: str = Field(..., description="Initial analysis of the provided code")
+    reasoning: List[str] = Field(..., description="Step-by-step reasoning before making changes")
+    actions_taken: List[str] = Field(..., description="List of actions applied to optimize or complete the code")
+    final_output: FinalOutput = Field(..., description="The optimized or completed function along with an explanation")
+    test_cases: List[TestCase] = Field(..., description="Generated test cases to validate the function")
+
 
 # Create client
 client = openai.OpenAI(
-    base_url = "https://api.groq.com/openai/v1",
-    api_key = os.environ['GROQ_API_KEY'],
+    base_url="https://api.groq.com/openai/v1",
+    # api_key=os.environ["GROQ_API_KEY"],
+    api_key="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"
 )
 
-# Define the schema for the output.
-class User(BaseModel):
-    name: str = Field(description="user name")
-    address: str = Field(description="address")
-    
-# Generate
-chat_completion = client.chat.completions.create(
-    model="llama-3.3-70b-versatile",
-    response_format={
-        "type": "json_object", 
-        "schema": User.model_json_schema()
-    },
-    messages=[
-        {"role": "system", "content": "You are a helpful assistant that answers in JSON."},
-        {"role": "user", "content": "Create a user named Alice, who lives in 42, Wonderland Avenue."}
-    ],
-)
+def predict(code_string):
+    # Generate request to Groq API
+    chat_completion = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        max_tokens=10000,
+        response_format={
+            "type": "json_object",
+            "schema": LLMResponse.model_json_schema()
+        },
+        messages=[
+            {"role": "system", "content": "You are an expert Python code optimizer. Return the response **strictly** in JSON format matching this schema:\n" + json.dumps(LLMResponse.model_json_schema(), indent=2)},
+            {"role": "user", "content": code_string}
+        ],
+    )
 
-created_user = json.loads(chat_completion.choices[0].message.content)
-print(json.dumps(created_user, indent=2))
+    # Parse and validate the result
+    try:
+        structured_response = json.loads(chat_completion.choices[0].message.content)
+        validated_response = LLMResponse(**structured_response)  # Validate against Pydantic schema
+        return validated_response.dict()  # Return validated response as a dictionary
+    except ValidationError as e:
+        return {
+            "error": "Validation Error! The LLM response didn't match the schema.",
+            "details": e.json(),
+            "raw_response": chat_completion.choices[0].message.content
+        }
+
+# print(predict("\n\ndef fibonacci(n):\n    if n <= 1:\n        return n\n    else:\n        return fibonacci(n-1) + fibonacci(n-2)"))
+# print(predict("\n\ndef sum_list(lst):\n    total = 0\n    for num in lst:\n        total += num\n    return total"))
