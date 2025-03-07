@@ -2,7 +2,18 @@ from fastapi import FastAPI
 from model_groq import predict
 from pydantic import BaseModel
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI()
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allow all headers
+)
 
 @app.get("/")
 async def root():
