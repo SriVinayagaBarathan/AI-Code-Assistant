@@ -14,7 +14,7 @@ const SuggestionsPanel = ({ response, loading }) => {
     return (
       <div className="w-1/4 p-4 bg-gray-900 text-white">
         <h3 className="text-lg font-bold">AI Suggestions</h3>
-        <p className="text-gray-400">No suggestions yet. Click "Optimize Code".</p>
+        <p className="text-gray-400">No suggestions yet. Click "Dang it".</p>
       </div>
     );
   }
