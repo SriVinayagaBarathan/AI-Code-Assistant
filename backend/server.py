@@ -19,7 +19,7 @@ class CodeOptimizerRequest(BaseModel):
 async def optimizeCode(code: CodeOptimizerRequest):
     response = predict(code.codeString)
 
-    return {"message": "Item created successfully", "item": response}
+    return {"message": "Base Optimised Code sent successfully", "optimised code": response}
 
 
 
