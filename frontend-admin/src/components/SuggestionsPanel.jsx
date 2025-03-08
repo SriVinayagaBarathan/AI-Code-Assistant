@@ -1,61 +1,101 @@
 import React from "react";
+import styled from "styled-components";
+
+const Panel = styled.div`
+  flex: 1;
+  padding: 20px;
+  background: #222;
+  overflow-y: auto;
+`;
+
+const Title = styled.h3`
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
+`;
+
+const CodeBlock = styled.pre`
+  background: #333;
+  padding: 10px;
+  border-radius: 5px;
+  overflow-x: auto;
+`;
+
+const CopyButton = styled.button`
+  background-color: #007bff;
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 10px;
+  transition: background 0.3s;
+
+  &:hover {
+    background-color: #0056b3;
+  }
+`;
 
 const SuggestionsPanel = ({ response, loading }) => {
   if (loading) {
     return (
-      <div className="w-1/4 p-4 bg-gray-900 text-white">
-        <h3 className="text-lg font-bold">AI Suggestions</h3>
-        <p className="text-gray-400">⏳ Optimizing your code...</p>
-      </div>
+      <Panel>
+        <Title>AI Suggestions</Title>
+        <p>⏳ Optimizing your code...</p>
+      </Panel>
     );
   }
 
   if (!response) {
     return (
-      <div className="w-1/4 p-4 bg-gray-900 text-white">
-        <h3 className="text-lg font-bold">AI Suggestions</h3>
-        <p className="text-gray-400">No suggestions yet. Click "Dang it".</p>
-      </div>
+      <Panel>
+        <Title>AI Suggestions</Title>
+        <p>No suggestions yet. Click "Optimize Code".</p>
+      </Panel>
     );
   }
 
   if (response.error) {
     return (
-      <div className="w-1/4 p-4 bg-gray-900 text-white">
-        <h3 className="text-lg font-bold">AI Suggestions</h3>
-        <p className="text-red-400">❌ {response.error}</p>
-      </div>
+      <Panel>
+        <Title>AI Suggestions</Title>
+        <p style={{ color: "red" }}>❌ {response.error}</p>
+      </Panel>
     );
   }
 
   const { observation, reasoning, actions_taken, final_output } = response["optimised code"];
 
-  return (
-    <div className="w-1/4 p-4 bg-gray-900 text-white overflow-auto">
-      <h3 className="text-lg font-bold">AI Suggestions</h3>
-      <p className="text-yellow-400 font-semibold">📝 Observation:</p>
-      <p>{observation}</p>
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(final_output.code);
+  };
 
-      <p className="text-yellow-400 font-semibold">🤔 Reasoning:</p>
-      <ul className="list-disc ml-4">
+  return (
+    <Panel>
+      <Title>AI Suggestions</Title>
+      <p><strong>📝 Observation:</strong> {observation}</p>
+
+      <p><strong>🤔 Reasoning:</strong></p>
+      <ul>
         {reasoning.map((item, index) => (
           <li key={index}>{item}</li>
         ))}
       </ul>
 
-      <p className="text-yellow-400 font-semibold">🚀 Actions Taken:</p>
-      <ul className="list-disc ml-4">
+      <p><strong>🚀 Actions Taken:</strong></p>
+      <ul>
         {actions_taken.map((item, index) => (
           <li key={index}>{item}</li>
         ))}
       </ul>
 
-      <p className="text-yellow-400 font-semibold">✅ Optimized Code:</p>
-      <pre className="bg-gray-800 p-2 rounded">{final_output.code}</pre>
+      <p><strong>✅ Optimized Code:</strong></p>
+      <CodeBlock>{final_output.code}</CodeBlock>
+      <CopyButton onClick={copyToClipboard}>Copy Code</CopyButton>
 
-      <p className="text-yellow-400 font-semibold">📝 Explanation:</p>
-      <p>{final_output.explanation}</p>
-    </div>
+      <p><strong>📝 Explanation:</strong> {final_output.explanation}</p>
+    </Panel>
   );
 };
 
