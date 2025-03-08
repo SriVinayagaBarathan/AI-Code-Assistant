@@ -8,10 +8,11 @@ import json
 import openai
 from pydantic import BaseModel, Field, ValidationError
 from typing import List, Dict, Any
+from dotenv import load_dotenv
 
 
 
-
+load_dotenv()
 
 # Define the schema for LLM response
 class TestCase(BaseModel):
@@ -36,8 +37,8 @@ class LLMResponse(BaseModel):
 # Create client
 client = openai.OpenAI(
     base_url="https://api.groq.com/openai/v1",
-    # api_key=os.environ["GROQ_API_KEY"],
-    api_key="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"
+    api_key=os.environ["GROQ_API_KEY"],
+   
 )
 
 def predict(code_string):
