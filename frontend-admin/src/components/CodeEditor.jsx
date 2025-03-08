@@ -29,9 +29,9 @@ const CodeEditor = () => {
   };
 
   return (
-    <div className="flex h-screen">
+    <div className="split left flex h-screen">
       {/* Code Editor Section */}
-      <div className="w-3/4 border-r p-4">
+      <div className="w-3/4 border-r p-4 ">
         <Editor
           height="90vh"
           defaultLanguage="python"
@@ -47,8 +47,12 @@ const CodeEditor = () => {
         </button>
       </div>
 
+          <div class="split right">
+
       {/* Suggestions Panel */}
       <SuggestionsPanel response={response} loading={loading} />
+      </div>
+    
     </div>
   );
 };
