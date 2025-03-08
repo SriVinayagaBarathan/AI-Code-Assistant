@@ -61,7 +61,7 @@ const CodeEditor = () => {
       <EditorContainer>
         <Editor height="85vh" defaultLanguage="python" value={code} onChange={handleEditorChange} theme="vs-dark" />
         <Button onClick={handleOptimize}>
-          {loading ? "Processing..." : "Optimize Code"}
+          {loading ? "Processing..." : "Dang!"}
         </Button>
       </EditorContainer>
       <SuggestionsPanel response={response} loading={loading} />
