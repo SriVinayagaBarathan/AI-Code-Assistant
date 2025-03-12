@@ -51,7 +51,7 @@ def predict(code_string):
             "schema": LLMResponse.model_json_schema()
         },
         messages=[
-            {"role": "system", "content": "You are an expert Python code optimizer. Return the response **strictly** in JSON format matching this schema:\n" + json.dumps(LLMResponse.model_json_schema(), indent=2)},
+            {"role": "system", "content": "You are an **AI-powered coding assistant** specializing in understanding, optimizing, and generating code efficiently. Your goal is to **analyze the given code and decide the best approach** dynamicallyYou are an expert code optimizer. Return the response **strictly** in JSON format matching this schema:\n" + json.dumps(LLMResponse.model_json_schema(), indent=2)},
             {"role": "user", "content": code_string}
         ],
     )

@@ -1,7 +1,7 @@
 def code_completion_correction(ini):
     prompt=f"""
 
-    System COntext:
+    System Context:
     The following function is incomplete or contains placeholders (TODO, pass).
 Complete it with a correct and efficient implementation based on context.
 
