@@ -57,16 +57,11 @@ def predict(code_string):
     )
 
     # Parse and validate the result
-    try:
-        structured_response = json.loads(chat_completion.choices[0].message.content)
-        validated_response = LLMResponse(**structured_response)  # Validate against Pydantic schema
-        return validated_response.dict()  # Return validated response as a dictionary
-    except ValidationError as e:
-        return {
-            "error": "Validation Error! The LLM response didn't match the schema.",
-            "details": e.json(),
-            "raw_response": chat_completion.choices[0].message.content
-        }
-
+   
+    structured_response = json.loads(chat_completion.choices[0].message.content)
+    validated_response = LLMResponse(**structured_response)  # Validate against Pydantic schema
+    print(validated_response)
+    return validated_response # Return validated response as a dictionary
+    
 # print(predict("\n\ndef fibonacci(n):\n    if n <= 1:\n        return n\n    else:\n        return fibonacci(n-1) + fibonacci(n-2)"))
 # print(predict("\n\ndef sum_list(lst):\n    total = 0\n    for num in lst:\n        total += num\n    return total"))
