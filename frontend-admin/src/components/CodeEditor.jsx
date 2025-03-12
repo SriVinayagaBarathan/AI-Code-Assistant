@@ -40,21 +40,37 @@ const CodeEditor = () => {
 
   const handleEditorChange = (newCode) => setCode(newCode);
 
+
+  //Base Optimization Code suggestion-L1
   const handleOptimize = async () => {
     console.log("🔥 Sending code to backend...");
     setLoading(true);
-
+  
     try {
-      const apiResponse = await optimizeCode(code);
+      let apiResponse = await optimizeCode(code);
       console.log("✅ Response received:", apiResponse);
+  
+      // Define expected keys-->Here checking whether we are getting all the keys from JSOn, if not send request again to backend, until we get the resultant
+      const expectedKeys = ["observation", "reasoning", "actions_taken", "final_output", "test_cases"];
+  
+      // Check if all expected keys exist in the response
+      const isValidResponse = expectedKeys.every(key => key in apiResponse);
+  
+      if (!isValidResponse) {
+        console.warn("⚠️ Missing keys in response, making another request...");
+        apiResponse = await optimizeCode(code); // Retry the API call
+        console.log("🔄 Retried Response:", apiResponse);
+      }
+  
       setResponse(apiResponse);
     } catch (error) {
       console.error("❌ API Error:", error);
       setResponse({ error: "Optimization failed!" });
     }
-
+  
     setLoading(false);
   };
+  
 
   return (
     <Container>
